@@ -13,7 +13,7 @@ function htmlEscape(str) {
 function update_values() {
   var el = $(this);
   var input = $('#change_input').show().offset(el.offset());
-  input.val(el.text()).attr("size", el.text().length).select().one("focusout", function() {
+  input.val(el.text()).attr("size", Math.max(10, el.text().length)).select().one("focusout", function() {
     if (el.text() != this.value) {
       el.closest("tr").addClass("changed");
       $('#save_button').show();

@@ -20,7 +20,6 @@
 #main_table .val {
   display: table-cell;
   text-align: left;
-  cursor: context-menu;
 }
 
 #main_table tr.changed {
