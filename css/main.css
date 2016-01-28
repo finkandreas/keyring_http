@@ -1,0 +1,28 @@
+#main_table {
+  border-collapse: collapse;
+}
+
+#main_table th, #main_table td {
+  border: 1px solid black;
+  padding: 1px 5px 1px 5px;
+  text-align: center;
+}
+
+#main_table .key_val {
+  display: table-row;
+}
+
+#main_table .key {
+  display: table-cell;
+  padding-right: 10px;
+  text-align: right;
+}
+#main_table .val {
+  display: table-cell;
+  text-align: left;
+  cursor: context-menu;
+}
+
+#main_table tr.changed {
+  background-color: LemonChiffon ;
+}
