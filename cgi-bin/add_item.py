@@ -23,8 +23,17 @@ password = data["password"]
 
 DBusGMainLoop(set_as_default=True)
 bus = dbus.SessionBus()
+
+# unlock
 bus.add_signal_receiver(handler_function=received_pw, signal_name="Completed", dbus_interface="org.freedesktop.Secret.Prompt", )
 secrets = bus.get_object("org.freedesktop.secrets", "/org/freedesktop/secrets")
+(unlocked, prompt) = secrets.get_dbus_method("Unlock", dbus_interface="org.freedesktop.Secret.Service")([collection])
+if collection not in unlocked:
+  bus.get_object("org.freedesktop.secrets", prompt).get_dbus_method("Prompt", dbus_interface="org.freedesktop.Secret.Prompt")("")
+  loop = GObject.MainLoop()
+  loop.run()
+
+# create item
 (_, session) = secrets.get_dbus_method("OpenSession", dbus_interface="org.freedesktop.Secret.Service")("plain", "")
 collectionProxy = bus.get_object("org.freedesktop.secrets", collection)
 attribs = { "org.freedesktop.Secret.Item.Label": label, "org.freedesktop.Secret.Item.Attributes": {'xdg:schema': 'org.freedesktop.Secret.Generic'} }

@@ -9,6 +9,21 @@ function htmlEscape(str) {
             .replace(/>/g, '&gt;');
 }
 
+
+function update_values() {
+  var el = $(this);
+  var input = $('#change_input').show().offset(el.offset());
+  input.val(el.text()).attr("size", el.text().length).select().one("focusout", function() {
+    if (el.text() != this.value) {
+      el.closest("tr").addClass("changed");
+      $('#save_button').show();
+    }
+    el.text(this.value);
+    input.hide();
+  });
+};
+
+
 function fill_table(keystore) {
   $('#main_table tbody').empty();
   allElements = []
@@ -20,30 +35,17 @@ function fill_table(keystore) {
       allElements.push('<td><span class="keyring_label">'+htmlEscape(item.label)+'</span></td>');
       allElements.push('<td><span class="password">'+htmlEscape(item.password)+'</span></td>');
       allElements.push('<td><span class="dbus_path">'+htmlEscape(item.dbus_path)+'</span></td>');
-      allElements.push('<td>');
+      allElements.push('<td class="key_val_cell">');
       sorted_keys = Object.keys(item.attributes).sort();
       $.each(sorted_keys, function(idx,key) {
         val = item.attributes[key];
         allElements.push('<div class="key_val"><span class="key">'+htmlEscape(key)+'</span><span class="val">'+htmlEscape(val)+'</span></div>');
       });
-      allElements.push('<div class="key_val"><span class="key">new_attrib</span><span class="val"></span></div></td></tr>');
+      allElements.push('</td></tr>');
     });
   });
   $('#main_table tbody').html(allElements.join(""));
 
-  // update attributes
-  var update_values = function() {
-    var el = $(this);
-    var input = $('#change_input').show().offset(el.offset());
-    input.val(el.text()).attr("size", el.text().length).focus().one("focusout", function() {
-      if (el.text() != this.value) {
-        el.closest("tr").addClass("changed");
-        $('#save_button').show();
-      }
-      el.text(this.value);
-      input.hide();
-    });
-  };
   $('#main_table .val, #main_table .keyring_label, #main_table .password, #main_table .key').click(update_values);
 
   // track mousenter on table rows for deletion
@@ -52,10 +54,15 @@ function fill_table(keystore) {
     var trPos = tr.offset();
     trPos.left += tr.width();
     GUI.ItemToDelete = $('.dbus_path', tr).text();
+    GUI.CurRow = tr;
     $('#del_button').show().offset(trPos);
+    $('#add_attrib_button').show();
+    trPos.left -= $('#add_attrib_button').outerWidth();
+    trPos.top += tr.height()-$('#add_attrib_button').outerHeight();
+    $('#add_attrib_button').offset(trPos);
   });
 
-  $('#save_button, #change_input, #del_button').hide();
+  $('#save_button, #change_input, #del_button, #add_attrib_button').hide();
 }
 
 
@@ -106,9 +113,18 @@ function del_entry() {
 }
 
 
+function add_attrib() {
+  var keyValPair = $('<div class="key_val"><span class="key">new_key</span><span class="val">new_value</span></div>');
+  $('.key, .val', keyValPair).click(update_values);
+  $('.key_val_cell', GUI.CurRow).append(keyValPair);
+  GUI.CurRow.addClass('changed');
+}
+
+
 $(function() {
   $.getJSON("cgi-bin/keyring.py", fill_table);
   $('#save_button').click(save_changes);
   $('#add_button').click(add_entry);
   $('#del_button').click(del_entry);
+  $('#add_attrib_button').click(add_attrib);
 });
