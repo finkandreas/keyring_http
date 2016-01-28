@@ -31,7 +31,7 @@ def process_item(item):
       bus.get_object("org.freedesktop.secrets", prompt).get_dbus_method("Prompt", dbus_interface="org.freedesktop.Secret.Prompt")("")
   else:
     secret = itemProxy.get_dbus_method("GetSecret", dbus_interface="org.freedesktop.Secret.Item")(session)
-    collected_results[item2collection[item]].append({"dbus_path" : item, "label": label, "attributes": attributes, "password": "".join(chr(val) for val in secret[2])})
+    collected_results[item2collection[item]].append({"dbus_path" : item, "label": label, "attributes": attributes, "password": str(bytearray(secret[2]), 'utf-8')})
     process_missing_items()
 
 def process_missing_items():
@@ -47,20 +47,21 @@ secrets = bus.get_object("org.freedesktop.secrets", "/org/freedesktop/secrets")
 (_, session) = secrets.get_dbus_method("OpenSession", dbus_interface="org.freedesktop.Secret.Service")("plain", "")
 
 collections = secrets.get_dbus_method("Get", dbus_interface="org.freedesktop.DBus.Properties")("org.freedesktop.Secret.Service", "Collections")
+item2collection = {}
+collected_results = {}
 for collection in collections:
   collectionProxy = bus.get_object("org.freedesktop.secrets", collection)
   collectionLabel = collectionProxy.get_dbus_method("Get", dbus_interface="org.freedesktop.DBus.Properties")("org.freedesktop.Secret.Collection", "Label")
   items = collectionProxy.get_dbus_method("Get", dbus_interface="org.freedesktop.DBus.Properties")("org.freedesktop.Secret.Collection", "Items")
-  item2collection = {}
-  collected_results = {}
+  collected_results[collection] = []
   for item in items:
     missing_items.add(item)
-    item2collection[item] = collectionLabel
-    collected_results[collectionLabel] = []
+    item2collection[item] = collection
 
 loop = GObject.MainLoop()
 process_missing_items()
 if len(missing_items) > 0:
   loop.run()
+
 print("Content-Type: application/json\n")
 print(json.dumps(collected_results))

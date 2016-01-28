@@ -25,8 +25,33 @@
       </table>
       <div style="padding-top: 10px;">
         <button type="button" id="save_button" class="btn btn-primary btn-lg" >Save changes</button>
-        <button type="button" id="save_button" class="btn btn-primary btn-lg" >Add entry</button>
+        <button type="button" id="add_button" class="btn btn-primary btn-lg" >Add entry</button>
       </div>
     </div>
+
+    <input id="change_input"></input>
+
+    <div id="add_entry_modal" class="modal fade" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">Add new entry</h4>
+          </div>
+          <div class="modal-body">
+            <label for="entry_label">Label: </label><input id="entry_label" />
+            <label for="entry_password">Password: </label><input id="entry_password" />
+            <div id="collection_chooser"></div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="button" class="btn btn-primary">Add entry</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button id="del_button" class="btn btn-danger" aria-label="Delete"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></button>
+
   </body>
 </html>
