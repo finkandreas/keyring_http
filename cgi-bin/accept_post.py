@@ -1,18 +1,16 @@
 #!/usr/bin/env python3
 
 import json
-import cgi
+import os
+#import cgi
 import sys
 
 # debug
-#import cgitb
-#cgitb.enable()
+import cgitb
+cgitb.enable()
 
-data = json.loads(cgi.FieldStorage().getvalue("json"))
-dbus_path = data["dbus_path"]
-label = data["label"]
-password = data["password"]
-attributes = data["attributes"]
+myJson = json.loads(sys.stdin.read(int(os.environ.get("CONTENT_LENGTH"))))
+sys.stderr.write(str(myJson)+"\n")
 
 print('Content-Type: application/json\n')
-print(json.dumps({"dbus_path": dbus_path, "label": label, "password": password, "attributes": attributes}))
+print(json.dumps({"status": "success"}))
