@@ -81,7 +81,7 @@ function save_changes() {
     });
     var data = {"label" : label, "password" : password, "attributes" : attributes, "dbus_path" : dbus_path};
     postCount++;
-    $.post("/cgi-bin/update_item.py", {"json": JSON.stringify(data)}, function(recvData, textStatus) {
+    $.post("/cgi-bin/update_item.py", JSON.stringify(data), function(recvData, textStatus) {
       if (--postCount == 0) $.getJSON("cgi-bin/keyring.py", fill_table);
     }, "json");
   });
@@ -98,18 +98,18 @@ function add_entry() {
   $('#collection_chooser input:first').prop("checked", "true")
   $('#add_entry_modal button.btn-primary').one('click', function() {
     var data = { "collection": availableCollections[$('#collection_chooser input:checked').val()], "label": $('#entry_label').val(), "password": $('#entry_password').val() };
-    $.post("/cgi-bin/add_item.py", {"json": JSON.stringify(data)}, function(recvData, textStatus) {
+    $.post("/cgi-bin/add_item.py", JSON.stringify(data), function(recvData, textStatus) {
       $.getJSON("cgi-bin/keyring.py", fill_table);
-    });
+    }, "json");
     $('#add_entry_modal').modal('hide');
   });
 };
 
 
 function del_entry() {
-  $.post("/cgi-bin/del_item.py", {"json": JSON.stringify({'dbus_path': GUI.ItemToDelete})}, function(recvData, textStatus) {
+  $.post("/cgi-bin/del_item.py", JSON.stringify({'dbus_path': GUI.ItemToDelete}), function(recvData, textStatus) {
     $.getJSON("cgi-bin/keyring.py", fill_table);
-  });
+  }, "json");
 }
 
 

@@ -1,14 +1,13 @@
 import json
-import cgi
 import dbus
 import sys
+import os
 from gi.repository import GObject
 from dbus.mainloop.glib import DBusGMainLoop
 
 
 def extract_json():
-  formData = cgi.FieldStorage()
-  return json.loads(formData.getvalue("json"))
+  return json.loads(str(sys.stdin.buffer.read(int(os.environ.get("CONTENT_LENGTH"))), 'utf-8'))
 
 
 class DbusProxyIface(object):
