@@ -49,7 +49,7 @@ function fill_table(keystore) {
   $('#main_table .val, #main_table .keyring_label, #main_table .password, #main_table .key').click(update_values);
 
   // track mousenter on table rows for deletion
-  $('#main_table tr').mouseenter(function() {
+  $('#main_table tbody tr').mouseenter(function() {
     var tr = $(this);
     var trPos = tr.offset();
     trPos.left += tr.width();
