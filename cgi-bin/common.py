@@ -41,7 +41,7 @@ class DbusKeyring(object):
   def GetSecret(self, item):
     if self.session == None: (_, self.session) = self.secretsProxy.CallMethod("OpenSession", "plain", "")
     secret = DbusProxyIface(self.bus.get_object("org.freedesktop.secrets", item), "org.freedesktop.Secret.Item").CallMethod("GetSecret", self.session)
-    return str(bytearray(secret[2]), 'utf-8')
+    return bytearray(secret[2]).decode('utf-8')
 
   def ToDbusSecret(self, password):
     if self.session == None: (_, self.session) = self.secretsProxy.CallMethod("OpenSession", "plain", "");
@@ -57,6 +57,20 @@ class DbusKeyring(object):
   def WaitForPrompt(self, prompt):
     DbusProxyIface(self.bus.get_object("org.freedesktop.secrets", prompt), "org.freedesktop.Secret.Prompt").CallMethod("Prompt", "")
     self.loop.run()
+
+  def FindItem(self, attributesToMatch):
+    (unlockedItems, lockedItems) = self.secretsProxy.CallMethod("SearchItems", attributesToMatch)
+    item = None
+    if len(unlockedItems) > 0:
+      item = unlockedItems[0]
+    elif len(lockedItems) > 0:
+      self.UnlockItem(lockedItems[0])
+      item = lockedItems[0]
+    else:
+      return (None, None)
+    allAttribs = DbusProxyIface(self.bus.get_object("org.freedesktop.secrets", item), "org.freedesktop.Secret.Item").GetProperty("Attributes")
+    return (allAttribs, self.GetSecret(item))
+
 
   def _received_pw(self, dismissed, objectPath):
     self.loop.quit()
