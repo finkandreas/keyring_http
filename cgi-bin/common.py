@@ -52,11 +52,13 @@ class DbusKeyring(object):
 
   def UnlockItem(self, item):
     (unlocked, prompt) = self.secretsProxy.CallMethod("Unlock", [item])
-    if item not in unlocked: self.WaitForPrompt(prompt)
+    if item not in unlocked: return self.WaitForPrompt(prompt)
+    return True
 
   def WaitForPrompt(self, prompt):
     DbusProxyIface(self.bus.get_object("org.freedesktop.secrets", prompt), "org.freedesktop.Secret.Prompt").CallMethod("Prompt", "")
     self.loop.run()
+    return not self.PromptDismissed
 
   def FindItem(self, attributesToMatch):
     (unlockedItems, lockedItems) = self.secretsProxy.CallMethod("SearchItems", attributesToMatch)
@@ -73,4 +75,5 @@ class DbusKeyring(object):
 
 
   def _received_pw(self, dismissed, objectPath):
+    self.PromptDismissed = dismissed
     self.loop.quit()
