@@ -2,6 +2,10 @@
 
 import json
 import common
+import sys
+
+export = False
+if len(sys.argv) > 1 and sys.argv[1] == 'export': export = True
 
 keyring = common.DbusKeyring()
 
@@ -18,7 +22,9 @@ for collection in collections:
     attributes = itemProxyIface.GetProperty("Attributes")
     label = itemProxyIface.GetProperty("Label")
     secret = keyring.GetSecret(item)
-    collected_results[collection].append({"dbus_path" : item, "label": label, "attributes": attributes, "password": secret})
+    if not export: collected_results[collection].append({"dbus_path" : item, "label": label, "attributes": attributes, "password": secret})
+    else: collected_results[collection].append({"label": label, "attributes": attributes, "password": secret})
 
-print("Content-Type: application/json\n")
-print(json.dumps(collected_results))
+
+if not export: print("Content-Type: application/json\n")
+print(json.dumps(collected_results, indent=4 if export else None))
