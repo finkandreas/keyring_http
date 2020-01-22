@@ -1,8 +1,11 @@
 #!/usr/bin/env python3
 
-import json
 import common
+import json
+import logging
 import sys
+
+logging.basicConfig(level=logging.DEBUG)
 
 export = False
 if len(sys.argv) > 1 and sys.argv[1] == 'export': export = True
