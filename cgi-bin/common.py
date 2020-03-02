@@ -52,7 +52,7 @@ class DbusKeyring(object):
 
   def UnlockItem(self, item):
     (unlocked, prompt) = self.secretsProxy.CallMethod("Unlock", [item])
-    if item not in unlocked: return self.WaitForPrompt(prompt)
+    if prompt != '/': return self.WaitForPrompt(prompt)
     return True
 
   def WaitForPrompt(self, prompt):
